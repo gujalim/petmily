@@ -5,6 +5,7 @@ class Pet {
   final String breed;
   final DateTime birthDate;
   final String? imageUrl;
+  final String? imageBase64; // 로컬 저장용 Base64 이미지
   final double weight;
   final String gender; // male, female
   final String? microchipId;
@@ -18,6 +19,7 @@ class Pet {
     required this.breed,
     required this.birthDate,
     this.imageUrl,
+    this.imageBase64,
     required this.weight,
     required this.gender,
     this.microchipId,
@@ -33,6 +35,7 @@ class Pet {
       breed: json['breed'],
       birthDate: DateTime.parse(json['birthDate']),
       imageUrl: json['imageUrl'],
+      imageBase64: json['imageBase64'],
       weight: json['weight'].toDouble(),
       gender: json['gender'],
       microchipId: json['microchipId'],
@@ -49,6 +52,7 @@ class Pet {
       'breed': breed,
       'birthDate': birthDate.toIso8601String(),
       'imageUrl': imageUrl,
+      'imageBase64': imageBase64,
       'weight': weight,
       'gender': gender,
       'microchipId': microchipId,
@@ -64,6 +68,7 @@ class Pet {
     String? breed,
     DateTime? birthDate,
     String? imageUrl,
+    String? imageBase64,
     double? weight,
     String? gender,
     String? microchipId,
@@ -77,6 +82,7 @@ class Pet {
       breed: breed ?? this.breed,
       birthDate: birthDate ?? this.birthDate,
       imageUrl: imageUrl ?? this.imageUrl,
+      imageBase64: imageBase64 ?? this.imageBase64,
       weight: weight ?? this.weight,
       gender: gender ?? this.gender,
       microchipId: microchipId ?? this.microchipId,

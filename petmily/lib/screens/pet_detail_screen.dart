@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../models/pet.dart';
+import '../providers/pet_provider.dart';
 import '../widgets/ad_banner.dart';
+import '../services/image_service.dart';
 
 class PetDetailScreen extends StatelessWidget {
   final Pet pet;
@@ -27,14 +30,14 @@ class PetDetailScreen extends StatelessWidget {
             tooltip: '홈으로',
           ),
           IconButton(
-            onPressed: () {
-              // TODO: Edit pet functionality
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('편집 기능은 곧 추가될 예정입니다!')),
-              );
-            },
+            onPressed: () => context.push('/edit-pet/${pet.id}'),
             icon: const Icon(Icons.edit),
             tooltip: '편집',
+          ),
+          IconButton(
+            onPressed: () => _showDeleteDialog(context),
+            icon: const Icon(Icons.delete),
+            tooltip: '삭제',
           ),
         ],
       ),
@@ -66,20 +69,7 @@ class PetDetailScreen extends StatelessWidget {
                             color: _getPetColor(pet.species),
                             borderRadius: BorderRadius.circular(60),
                           ),
-                          child: pet.imageUrl != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(60),
-                                  child: Image.network(
-                                    pet.imageUrl!,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              : Center(
-                                  child: Text(
-                                    _getPetEmoji(pet.species),
-                                    style: const TextStyle(fontSize: 60),
-                                  ),
-                                ),
+                          child: _buildPetImage(pet),
                         ),
                         const SizedBox(height: 16),
                         // Pet name
@@ -300,5 +290,83 @@ class PetDetailScreen extends StatelessWidget {
       default:
         return species;
     }
+  }
+
+  Widget _buildPetImage(Pet pet) {
+    // Base64 이미지가 있으면 표시
+    if (pet.imageBase64 != null) {
+      final image = ImageService.decodeImageFromBase64(pet.imageBase64);
+      if (image != null) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(60),
+          child: image,
+        );
+      }
+    }
+    
+    // URL 이미지가 있으면 표시
+    if (pet.imageUrl != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(60),
+        child: Image.network(
+          pet.imageUrl!,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Center(
+              child: Text(
+                _getPetEmoji(pet.species),
+                style: const TextStyle(fontSize: 60),
+              ),
+            );
+          },
+        ),
+      );
+    }
+    
+    // 기본 이모지 표시
+    return Center(
+      child: Text(
+        _getPetEmoji(pet.species),
+        style: const TextStyle(fontSize: 60),
+      ),
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Petmily 삭제'),
+          content: Text('${pet.name}을(를) 정말로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('취소'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                final petProvider = Provider.of<PetProvider>(context, listen: false);
+                await petProvider.deletePet(pet.id);
+                if (context.mounted) {
+                  context.go('/pets');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${pet.name}이(가) 삭제되었습니다.'),
+                      backgroundColor: const Color(0xFFF48FB1),
+                    ),
+                  );
+                }
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: const Text('삭제'),
+            ),
+          ],
+        );
+      },
+    );
   }
 } 

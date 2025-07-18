@@ -7,6 +7,7 @@ import 'screens/new_home_screen.dart';
 import 'screens/pet_list_screen.dart';
 import 'screens/add_pet_screen.dart';
 import 'screens/pet_detail_screen.dart';
+import 'screens/edit_pet_screen.dart';
 import 'screens/nearby_screen.dart';
 import 'providers/pet_provider.dart';
 import 'models/pet.dart';
@@ -24,7 +25,16 @@ class PetmilyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => PetProvider()),
+        ChangeNotifierProvider(
+          create: (_) {
+            final provider = PetProvider();
+            // 앱 시작 시 데이터 로드
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              provider.loadPets();
+            });
+            return provider;
+          },
+        ),
       ],
       child: MaterialApp.router(
         title: 'Petmily',
@@ -66,19 +76,36 @@ final GoRouter _router = GoRouter(
       path: '/pet/:id',
       builder: (context, state) {
         final petId = state.pathParameters['id']!;
-        // TODO: Get pet from provider instead of creating dummy
-        final pet = Pet(
-          id: petId,
-          name: petId == '1' ? '멍멍이' : '냥냥이',
-          species: petId == '1' ? 'dog' : 'cat',
-          breed: petId == '1' ? '골든 리트리버' : '페르시안',
-          birthDate: DateTime.now().subtract(Duration(days: 365 * (petId == '1' ? 2 : 1))),
-          weight: petId == '1' ? 25.5 : 4.2,
-          gender: petId == '1' ? 'male' : 'female',
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        );
+        final petProvider = Provider.of<PetProvider>(context, listen: false);
+        final pet = petProvider.getPetById(petId);
+        
+        if (pet == null) {
+          return const Scaffold(
+            body: Center(
+              child: Text('Petmily를 찾을 수 없습니다.'),
+            ),
+          );
+        }
+        
         return PetDetailScreen(pet: pet);
+      },
+    ),
+    GoRoute(
+      path: '/edit-pet/:id',
+      builder: (context, state) {
+        final petId = state.pathParameters['id']!;
+        final petProvider = Provider.of<PetProvider>(context, listen: false);
+        final pet = petProvider.getPetById(petId);
+        
+        if (pet == null) {
+          return const Scaffold(
+            body: Center(
+              child: Text('Petmily를 찾을 수 없습니다.'),
+            ),
+          );
+        }
+        
+        return EditPetScreen(pet: pet);
       },
     ),
   ],
