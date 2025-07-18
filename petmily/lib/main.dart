@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 import 'screens/new_home_screen.dart';
 import 'screens/pet_list_screen.dart';
@@ -18,9 +19,11 @@ import 'models/pet.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Firebase 초기화 (옵셔널)
+  // Firebase 초기화
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     print('Firebase 초기화 성공');
   } catch (e) {
     print('Firebase 초기화 실패 (로컬 모드로 실행): $e');
