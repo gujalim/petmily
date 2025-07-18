@@ -75,10 +75,17 @@ class _AddPetScreenState extends State<AddPetScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('반려동물 등록'),
+        title: const Text('새 Petmily 등록'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () => context.go('/'),
+            icon: const Icon(Icons.home),
+            tooltip: '홈으로',
+          ),
+        ],
       ),
       body: Form(
         key: _formKey,
@@ -104,10 +111,11 @@ class _AddPetScreenState extends State<AddPetScreen> {
                               fit: BoxFit.cover,
                             ),
                           )
-                        : Icon(
-                            _getPetIcon(_selectedSpecies),
-                            color: Colors.white,
-                            size: 60,
+                        : Center(
+                            child: Text(
+                              _getPetEmoji(_selectedSpecies),
+                              style: const TextStyle(fontSize: 60),
+                            ),
                           ),
                   ),
                   const SizedBox(height: 16),
@@ -257,7 +265,7 @@ class _AddPetScreenState extends State<AddPetScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               child: const Text(
-                '반려동물 등록',
+                '새 Petmily 등록',
                 style: TextStyle(fontSize: 16),
               ),
             ),
@@ -270,38 +278,38 @@ class _AddPetScreenState extends State<AddPetScreen> {
   Color _getPetColor(String species) {
     switch (species.toLowerCase()) {
       case 'dog':
-        return Colors.orange;
+        return const Color(0xFFFFB74D); // 파스텔 오렌지
       case 'cat':
-        return Colors.purple;
+        return const Color(0xFFE1BEE7); // 파스텔 보라
       case 'bird':
-        return Colors.blue;
+        return const Color(0xFF81C784); // 파스텔 그린
       case 'fish':
-        return Colors.cyan;
+        return const Color(0xFF81D4FA); // 파스텔 블루
       case 'rabbit':
-        return Colors.pink;
+        return const Color(0xFFF8BBD9); // 파스텔 핑크
       case 'hamster':
-        return Colors.brown;
+        return const Color(0xFFD7CCC8); // 파스텔 브라운
       default:
-        return Colors.grey;
+        return const Color(0xFFE0E0E0); // 파스텔 그레이
     }
   }
 
-  IconData _getPetIcon(String species) {
+  String _getPetEmoji(String species) {
     switch (species.toLowerCase()) {
       case 'dog':
-        return Icons.pets;
+        return '🐕';
       case 'cat':
-        return Icons.pets;
+        return '🐈';
       case 'bird':
-        return Icons.flutter_dash;
+        return '🐦';
       case 'fish':
-        return Icons.water;
+        return '🐠';
       case 'rabbit':
-        return Icons.pets;
+        return '🐰';
       case 'hamster':
-        return Icons.pets;
+        return '🐹';
       default:
-        return Icons.pets;
+        return '🐾';
     }
   }
 

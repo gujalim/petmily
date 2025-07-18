@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../providers/pet_provider.dart';
 import '../widgets/pet_card.dart';
 
@@ -12,13 +13,48 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  BannerAd? _bannerAd;
+  bool _isAdLoaded = false;
+
   @override
   void initState() {
     super.initState();
     // Load pets when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PetProvider>().loadPets();
+      _loadBannerAd();
     });
+  }
+
+  void _loadBannerAd() {
+    // TODO: Implement actual ad loading when AdMob is set up
+    // _bannerAd = BannerAd(
+    //   adUnitId: _getBannerAdUnitId(),
+    //   size: AdSize.banner,
+    //   request: const AdRequest(),
+    //   listener: BannerAdListener(
+    //     onAdLoaded: (ad) {
+    //       setState(() {
+    //         _isAdLoaded = true;
+    //       });
+    //     },
+    //     onAdFailedToLoad: (ad, error) {
+    //       ad.dispose();
+    //     },
+    //   ),
+    // );
+    // _bannerAd!.load();
+  }
+
+  String _getBannerAdUnitId() {
+    // Test ad unit ID - replace with your actual ad unit ID
+    return 'ca-app-pub-3940256099942544/6300978111';
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
   }
 
   @override
@@ -82,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    '아직 등록된 반려동물이 없습니다',
+                    '아직 등록된 Petmily가 없습니다',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey,
@@ -90,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    '새로운 반려동물을 등록해보세요!',
+                    '새로운 Petmily를 등록해보세요!',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey,
@@ -100,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ElevatedButton.icon(
                     onPressed: () => context.go('/add-pet'),
                     icon: const Icon(Icons.add),
-                    label: const Text('반려동물 등록'),
+                    label: const Text('새 Petmily 등록'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
@@ -156,30 +192,53 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            '내 반려동물',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                                                const Text(
+                        'My Petmily',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                          ElevatedButton.icon(
+                            onPressed: () => context.go('/add-pet'),
+                            icon: const Text('🐾', style: TextStyle(fontSize: 16)),
+                            label: const Text(
+                              '새 가족',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          TextButton(
-                            onPressed: () => context.go('/pets'),
-                            child: const Text('전체보기'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              elevation: 4,
+                            ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 16),
                       Expanded(
-                        child: ListView.builder(
-                          itemCount: petProvider.pets.length,
-                          itemBuilder: (context, index) {
-                            final pet = petProvider.pets[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: PetCard(pet: pet),
-                            );
-                          },
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: petProvider.pets.length,
+                                itemBuilder: (context, index) {
+                                  final pet = petProvider.pets[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: PetCard(pet: pet),
+                                  );
+                                },
+                              ),
+                            ),
+                            // Ad Banner removed - using new home screen
+                          ],
                         ),
                       ),
                     ],
@@ -190,12 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.go('/add-pet'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
-      ),
+      // Floating action button removed - moved to top right
     );
   }
 } 

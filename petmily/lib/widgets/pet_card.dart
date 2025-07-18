@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../models/pet.dart';
 
 class PetCard extends StatelessWidget {
@@ -35,18 +36,20 @@ class PetCard extends StatelessWidget {
                         pet.imageUrl!,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
-                          return Icon(
-                            _getPetIcon(pet.species),
-                            color: Colors.white,
-                            size: 30,
+                          return Center(
+                            child: Text(
+                              _getPetEmoji(pet.species),
+                              style: const TextStyle(fontSize: 30),
+                            ),
                           );
                         },
                       ),
                     )
-                  : Icon(
-                      _getPetIcon(pet.species),
-                      color: Colors.white,
-                      size: 30,
+                  : Center(
+                      child: Text(
+                        _getPetEmoji(pet.species),
+                        style: const TextStyle(fontSize: 30),
+                      ),
                     ),
             ),
             const SizedBox(width: 16),
@@ -82,12 +85,29 @@ class PetCard extends StatelessWidget {
               ),
             ),
             // Action button
-            IconButton(
-              onPressed: () {
-                // TODO: Navigate to pet detail screen
-              },
-              icon: const Icon(Icons.arrow_forward_ios),
-              color: Colors.grey[400],
+            Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                onPressed: () {
+                  context.go('/pet/${pet.id}');
+                },
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                padding: const EdgeInsets.all(8),
+              ),
             ),
           ],
         ),
@@ -98,30 +118,38 @@ class PetCard extends StatelessWidget {
   Color _getPetColor(String species) {
     switch (species.toLowerCase()) {
       case 'dog':
-        return Colors.orange;
+        return const Color(0xFFFFB74D); // 파스텔 오렌지
       case 'cat':
-        return Colors.purple;
+        return const Color(0xFFE1BEE7); // 파스텔 보라
       case 'bird':
-        return Colors.blue;
+        return const Color(0xFF81C784); // 파스텔 그린
       case 'fish':
-        return Colors.cyan;
+        return const Color(0xFF81D4FA); // 파스텔 블루
+      case 'rabbit':
+        return const Color(0xFFF8BBD9); // 파스텔 핑크
+      case 'hamster':
+        return const Color(0xFFD7CCC8); // 파스텔 브라운
       default:
-        return Colors.grey;
+        return const Color(0xFFE0E0E0); // 파스텔 그레이
     }
   }
 
-  IconData _getPetIcon(String species) {
+  String _getPetEmoji(String species) {
     switch (species.toLowerCase()) {
       case 'dog':
-        return Icons.pets;
+        return '🐕';
       case 'cat':
-        return Icons.pets;
+        return '🐈';
       case 'bird':
-        return Icons.flutter_dash;
+        return '🐦';
       case 'fish':
-        return Icons.water;
+        return '🐠';
+      case 'rabbit':
+        return '🐰';
+      case 'hamster':
+        return '🐹';
       default:
-        return Icons.pets;
+        return '🐾';
     }
   }
 } 
