@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'services/ad_service.dart';
 
 import 'screens/new_home_screen.dart';
 import 'screens/pet_list_screen.dart';
@@ -29,7 +30,14 @@ void main() async {
     print('Firebase 초기화 실패 (로컬 모드로 실행): $e');
   }
   
-  // MobileAds.instance.initialize(); // Commented out for web compatibility
+  // 광고 초기화
+  try {
+    await AdService.initialize();
+    print('광고 초기화 성공');
+  } catch (e) {
+    print('광고 초기화 실패: $e');
+  }
+  
   runApp(const PetmilyApp());
 }
 

@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../providers/pet_provider.dart';
 import '../providers/auth_provider.dart';
-import '../widgets/ad_banner.dart';
+import '../widgets/banner_ad_widget.dart';
 
 class NewHomeScreen extends StatefulWidget {
   const NewHomeScreen({super.key});
@@ -217,7 +217,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
               ),
               
               // Ad Banner
-              const AdBanner(),
+              const BannerAdWidget(),
             ],
           );
         },

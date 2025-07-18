@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/pet.dart';
 import '../providers/pet_provider.dart';
-import '../widgets/ad_banner.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../services/image_service.dart';
 
 class PetDetailScreen extends StatelessWidget {
@@ -185,7 +185,7 @@ class PetDetailScreen extends StatelessWidget {
             ),
           ),
           // Ad Banner
-          const AdBanner(),
+          const BannerAdWidget(),
         ],
       ),
     );

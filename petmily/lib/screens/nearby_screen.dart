@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
-import '../widgets/ad_banner.dart';
+import '../widgets/banner_ad_widget.dart';
 
 class NearbyScreen extends StatefulWidget {
   const NearbyScreen({super.key});
@@ -257,7 +257,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
           ),
           
           // Ad Banner
-          const AdBanner(),
+          const BannerAdWidget(),
         ],
       ),
     );

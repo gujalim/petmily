@@ -6,6 +6,7 @@ import 'dart:io';
 import '../models/pet.dart';
 import '../providers/pet_provider.dart';
 import '../services/image_service.dart';
+import '../widgets/banner_ad_widget.dart';
 
 class EditPetScreen extends StatefulWidget {
   final Pet pet;
@@ -127,25 +128,8 @@ class _EditPetScreenState extends State<EditPetScreen> {
             key: _formKey,
             child: ListView(
               children: [
-                // Banner Ad Space
-                Container(
-                  height: 60,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFF48FB1), width: 2),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      '📱 광고 공간',
-                      style: TextStyle(
-                        color: Color(0xFFF48FB1),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+                // Banner Ad
+                const BannerAdWidget(),
                 
                 // Pet Image
                 GestureDetector(
