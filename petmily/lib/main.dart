@@ -2,18 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'screens/new_home_screen.dart';
 import 'screens/pet_list_screen.dart';
 import 'screens/add_pet_screen.dart';
 import 'screens/pet_detail_screen.dart';
 import 'screens/edit_pet_screen.dart';
+import 'screens/auth_screen.dart';
 import 'screens/nearby_screen.dart';
 import 'providers/pet_provider.dart';
+import 'providers/auth_provider.dart';
 import 'models/pet.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Firebase 초기화
+  try {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "your-api-key",
+        authDomain: "your-project.firebaseapp.com",
+        projectId: "your-project-id",
+        storageBucket: "your-project.appspot.com",
+        messagingSenderId: "your-sender-id",
+        appId: "your-app-id",
+      ),
+    );
+  } catch (e) {
+    print('Firebase 초기화 실패: $e');
+  }
+  
   // MobileAds.instance.initialize(); // Commented out for web compatibility
   runApp(const PetmilyApp());
 }
@@ -35,6 +55,7 @@ class PetmilyApp extends StatelessWidget {
             return provider;
           },
         ),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
       child: MaterialApp.router(
         title: 'Petmily',
@@ -56,6 +77,10 @@ class PetmilyApp extends StatelessWidget {
 final GoRouter _router = GoRouter(
   initialLocation: '/',
   routes: [
+    GoRoute(
+      path: '/auth',
+      builder: (context, state) => const AuthScreen(),
+    ),
     GoRoute(
       path: '/',
       builder: (context, state) => const NewHomeScreen(),

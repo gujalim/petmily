@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../models/pet.dart';
 import '../services/storage_service.dart';
+import '../services/firebase_service.dart';
 
 class PetProvider with ChangeNotifier {
   List<Pet> _pets = [];
@@ -26,6 +27,12 @@ class PetProvider with ChangeNotifier {
     try {
       _pets.add(pet);
       await _storageService.savePet(pet);
+      // Firebase에도 저장 (인증된 사용자인 경우)
+      try {
+        await FirebaseService.savePet(pet);
+      } catch (e) {
+        print('Firebase 저장 실패 (로컬 저장소 사용): $e');
+      }
       notifyListeners();
     } catch (e) {
       setError('Petmily 추가에 실패했습니다.');
@@ -39,6 +46,12 @@ class PetProvider with ChangeNotifier {
       if (index != -1) {
         _pets[index] = updatedPet;
         await _storageService.savePet(updatedPet);
+        // Firebase에도 업데이트 (인증된 사용자인 경우)
+        try {
+          await FirebaseService.updatePet(updatedPet);
+        } catch (e) {
+          print('Firebase 업데이트 실패 (로컬 저장소 사용): $e');
+        }
         notifyListeners();
       }
     } catch (e) {
@@ -51,6 +64,12 @@ class PetProvider with ChangeNotifier {
     try {
       _pets.removeWhere((pet) => pet.id == id);
       await _storageService.deletePet(id);
+      // Firebase에서도 삭제 (인증된 사용자인 경우)
+      try {
+        await FirebaseService.deletePet(id);
+      } catch (e) {
+        print('Firebase 삭제 실패 (로컬 저장소 사용): $e');
+      }
       notifyListeners();
     } catch (e) {
       setError('Petmily 삭제에 실패했습니다.');

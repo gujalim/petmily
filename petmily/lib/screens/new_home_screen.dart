@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../providers/pet_provider.dart';
+import '../providers/auth_provider.dart';
 import '../widgets/ad_banner.dart';
 
 class NewHomeScreen extends StatefulWidget {
@@ -35,6 +36,28 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          Consumer<AuthProvider>(
+            builder: (context, authProvider, child) {
+              return authProvider.isAuthenticated
+                  ? IconButton(
+                      icon: const Icon(Icons.logout),
+                      onPressed: () async {
+                        await authProvider.signOut();
+                        if (context.mounted) {
+                          context.go('/auth');
+                        }
+                      },
+                      tooltip: '로그아웃',
+                    )
+                  : IconButton(
+                      icon: const Icon(Icons.login),
+                      onPressed: () => context.go('/auth'),
+                      tooltip: '로그인',
+                    );
+            },
+          ),
+        ],
       ),
       body: Consumer<PetProvider>(
         builder: (context, petProvider, child) {

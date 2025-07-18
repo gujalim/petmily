@@ -209,7 +209,7 @@ class _EditPetScreenState extends State<EditPetScreen> {
                 _buildTextField(
                   controller: _breedController,
                   label: '품종',
-                  icon: Icons.breed,
+                  icon: Icons.category,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return '품종을 입력해주세요';
@@ -401,7 +401,7 @@ class _EditPetScreenState extends State<EditPetScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(
-          _getPetEmoji(_selectedSpecies),
+          _getPetIcon(_selectedSpecies),
           size: 64,
           color: const Color(0xFFF48FB1),
         ),
@@ -423,6 +423,25 @@ class _EditPetScreenState extends State<EditPetScreen> {
         ),
       ],
     );
+  }
+
+  IconData _getPetIcon(String species) {
+    switch (species.toLowerCase()) {
+      case 'dog':
+        return Icons.pets;
+      case 'cat':
+        return Icons.pets;
+      case 'bird':
+        return Icons.flutter_dash;
+      case 'fish':
+        return Icons.water_drop;
+      case 'rabbit':
+        return Icons.pets;
+      case 'hamster':
+        return Icons.pets;
+      default:
+        return Icons.pets;
+    }
   }
 
   String _getPetEmoji(String species) {
