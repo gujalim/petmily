@@ -17,7 +17,10 @@ class FirebaseService {
   static Future<void> savePet(Pet pet) async {
     try {
       final userId = currentUserId;
-      if (userId == null) throw Exception('사용자가 로그인되지 않았습니다.');
+      if (userId == null) {
+        print('사용자가 로그인되지 않음 - 로컬 저장소만 사용');
+        return;
+      }
 
       await _firestore
           .collection('users')
@@ -26,8 +29,8 @@ class FirebaseService {
           .doc(pet.id)
           .set(pet.toJson());
     } catch (e) {
-      print('Pet 저장 중 오류: $e');
-      rethrow;
+      print('Firebase Pet 저장 중 오류 (로컬 저장소 사용): $e');
+      // Firebase 오류 시 예외를 던지지 않고 로컬 저장소만 사용
     }
   }
 
@@ -35,7 +38,10 @@ class FirebaseService {
   static Future<List<Pet>> loadPets() async {
     try {
       final userId = currentUserId;
-      if (userId == null) throw Exception('사용자가 로그인되지 않았습니다.');
+      if (userId == null) {
+        print('사용자가 로그인되지 않음 - 빈 리스트 반환');
+        return [];
+      }
 
       final snapshot = await _firestore
           .collection('users')
@@ -47,8 +53,8 @@ class FirebaseService {
           .map((doc) => Pet.fromJson(doc.data()))
           .toList();
     } catch (e) {
-      print('Pet 불러오기 중 오류: $e');
-      rethrow;
+      print('Firebase Pet 불러오기 중 오류 (빈 리스트 반환): $e');
+      return [];
     }
   }
 
@@ -56,7 +62,10 @@ class FirebaseService {
   static Future<void> updatePet(Pet pet) async {
     try {
       final userId = currentUserId;
-      if (userId == null) throw Exception('사용자가 로그인되지 않았습니다.');
+      if (userId == null) {
+        print('사용자가 로그인되지 않음 - 로컬 저장소만 사용');
+        return;
+      }
 
       await _firestore
           .collection('users')
@@ -65,8 +74,8 @@ class FirebaseService {
           .doc(pet.id)
           .update(pet.toJson());
     } catch (e) {
-      print('Pet 업데이트 중 오류: $e');
-      rethrow;
+      print('Firebase Pet 업데이트 중 오류 (로컬 저장소 사용): $e');
+      // Firebase 오류 시 예외를 던지지 않고 로컬 저장소만 사용
     }
   }
 
@@ -74,7 +83,10 @@ class FirebaseService {
   static Future<void> deletePet(String petId) async {
     try {
       final userId = currentUserId;
-      if (userId == null) throw Exception('사용자가 로그인되지 않았습니다.');
+      if (userId == null) {
+        print('사용자가 로그인되지 않음 - 로컬 저장소만 사용');
+        return;
+      }
 
       await _firestore
           .collection('users')
@@ -83,8 +95,8 @@ class FirebaseService {
           .doc(petId)
           .delete();
     } catch (e) {
-      print('Pet 삭제 중 오류: $e');
-      rethrow;
+      print('Firebase Pet 삭제 중 오류 (로컬 저장소 사용): $e');
+      // Firebase 오류 시 예외를 던지지 않고 로컬 저장소만 사용
     }
   }
 
@@ -124,7 +136,10 @@ class FirebaseService {
   static Stream<List<Pet>> petsStream() {
     try {
       final userId = currentUserId;
-      if (userId == null) throw Exception('사용자가 로그인되지 않았습니다.');
+      if (userId == null) {
+        print('사용자가 로그인되지 않음 - 빈 스트림 반환');
+        return Stream.value([]);
+      }
 
       return _firestore
           .collection('users')
@@ -135,8 +150,8 @@ class FirebaseService {
               .map((doc) => Pet.fromJson(doc.data()))
               .toList());
     } catch (e) {
-      print('실시간 업데이트 리스너 오류: $e');
-      rethrow;
+      print('Firebase 실시간 업데이트 리스너 오류 (빈 스트림 반환): $e');
+      return Stream.value([]);
     }
   }
 } 

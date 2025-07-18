@@ -18,20 +18,12 @@ import 'models/pet.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Firebase 초기화
+  // Firebase 초기화 (옵셔널)
   try {
-    await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey: "your-api-key",
-        authDomain: "your-project.firebaseapp.com",
-        projectId: "your-project-id",
-        storageBucket: "your-project.appspot.com",
-        messagingSenderId: "your-sender-id",
-        appId: "your-app-id",
-      ),
-    );
+    await Firebase.initializeApp();
+    print('Firebase 초기화 성공');
   } catch (e) {
-    print('Firebase 초기화 실패: $e');
+    print('Firebase 초기화 실패 (로컬 모드로 실행): $e');
   }
   
   // MobileAds.instance.initialize(); // Commented out for web compatibility

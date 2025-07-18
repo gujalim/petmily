@@ -22,6 +22,10 @@ class AuthService {
       );
     } catch (e) {
       print('회원가입 중 오류: $e');
+      // Firebase가 초기화되지 않은 경우 시뮬레이션
+      if (e.toString().contains('No Firebase App')) {
+        throw Exception('Firebase가 설정되지 않았습니다. 로컬 모드로 실행됩니다.');
+      }
       rethrow;
     }
   }
@@ -38,6 +42,10 @@ class AuthService {
       );
     } catch (e) {
       print('로그인 중 오류: $e');
+      // Firebase가 초기화되지 않은 경우 시뮬레이션
+      if (e.toString().contains('No Firebase App')) {
+        throw Exception('Firebase가 설정되지 않았습니다. 로컬 모드로 실행됩니다.');
+      }
       rethrow;
     }
   }
