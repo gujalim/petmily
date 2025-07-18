@@ -39,6 +39,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
         actions: [
           Consumer<AuthProvider>(
             builder: (context, authProvider, child) {
+              print('Auth state in home: ${authProvider.isAuthenticated}, User: ${authProvider.user?.email}');
               return authProvider.isAuthenticated
                   ? IconButton(
                       icon: const Icon(Icons.logout),
@@ -77,24 +78,44 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      '안녕하세요!',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Consumer<AuthProvider>(
+                      builder: (context, authProvider, child) {
+                        return Text(
+                          authProvider.isAuthenticated 
+                              ? '안녕하세요, ${authProvider.user?.email ?? '사용자'}님!'
+                              : '안녕하세요!',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      },
                     ),
 
                     const SizedBox(height: 8),
-                    Text(
-                      petProvider.pets.isEmpty 
-                          ? '새로운 Petmily를 등록해보세요!'
-                          : '${petProvider.pets.length}마리의 Petmily와 함께하고 있어요',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
-                      ),
+                    Consumer<AuthProvider>(
+                      builder: (context, authProvider, child) {
+                        if (!authProvider.isAuthenticated) {
+                          return const Text(
+                            '로그인하여 Petmily를 관리해보세요!',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 16,
+                            ),
+                          );
+                        }
+                        
+                        return Text(
+                          petProvider.pets.isEmpty 
+                              ? '새로운 Petmily를 등록해보세요!'
+                              : '${petProvider.pets.length}마리의 Petmily와 함께하고 있어요',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 16,
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -107,15 +128,27 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                   child: Column(
                     children: [
                       // My Pets Card
-                      _buildMenuCard(
-                        context,
-                        title: 'My Petmily',
-                        subtitle: petProvider.pets.isEmpty 
-                            ? '새로운 Petmily를 등록해보세요'
-                            : '${petProvider.pets.length}마리의 Petmily 관리하기',
-                        icon: Icons.pets,
-                        iconColor: const Color(0xFFFFB74D),
-                        onTap: () => context.go('/pets'),
+                      Consumer<AuthProvider>(
+                        builder: (context, authProvider, child) {
+                          return _buildMenuCard(
+                            context,
+                            title: 'My Petmily',
+                            subtitle: !authProvider.isAuthenticated
+                                ? '로그인하여 Petmily 관리하기'
+                                : petProvider.pets.isEmpty 
+                                    ? '새로운 Petmily를 등록해보세요'
+                                    : '${petProvider.pets.length}마리의 Petmily 관리하기',
+                            icon: Icons.pets,
+                            iconColor: const Color(0xFFFFB74D),
+                            onTap: () {
+                              if (!authProvider.isAuthenticated) {
+                                context.go('/auth');
+                              } else {
+                                context.go('/pets');
+                              }
+                            },
+                          );
+                        },
                       ),
                       
                       const SizedBox(height: 20),
@@ -133,41 +166,51 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                       const SizedBox(height: 20),
                       
                       // Quick Actions
-                      if (petProvider.pets.isNotEmpty) ...[
-                        const Text(
-                          '빠른 액션',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildQuickActionCard(
-                                context,
-                                title: '새 Petmily',
-                                icon: '🐾',
-                                onTap: () => context.go('/add-pet'),
+                      Consumer<AuthProvider>(
+                        builder: (context, authProvider, child) {
+                          if (!authProvider.isAuthenticated) {
+                            return const SizedBox.shrink();
+                          }
+                          
+                          return Column(
+                            children: [
+                              const Text(
+                                '빠른 액션',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildQuickActionCard(
-                                context,
-                                title: '건강 체크',
-                                icon: '🏥',
-                                onTap: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('건강 체크 기능은 곧 추가될 예정입니다!')),
-                                  );
-                                },
+                              const SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildQuickActionCard(
+                                      context,
+                                      title: '새 Petmily',
+                                      icon: '🐾',
+                                      onTap: () => context.go('/add-pet'),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: _buildQuickActionCard(
+                                      context,
+                                      title: '건강 체크',
+                                      icon: '🏥',
+                                      onTap: () {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('건강 체크 기능은 곧 추가될 예정입니다!')),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),

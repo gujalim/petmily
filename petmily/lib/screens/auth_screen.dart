@@ -50,14 +50,27 @@ class _AuthScreenState extends State<AuthScreen> {
           );
         }
 
+        // 인증 상태 확인 후 홈으로 이동
         if (mounted) {
-          context.go('/');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(_isLogin ? '로그인되었습니다! 🎉' : '회원가입되었습니다! 🎉'),
-              backgroundColor: const Color(0xFFF48FB1),
-            ),
-          );
+          // 잠시 대기하여 인증 상태 업데이트 확인
+          await Future.delayed(const Duration(milliseconds: 500));
+          
+          if (authProvider.isAuthenticated) {
+            context.go('/');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(_isLogin ? '로그인되었습니다! 🎉' : '회원가입되었습니다! 🎉'),
+                backgroundColor: const Color(0xFFF48FB1),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('로그인에 실패했습니다. 다시 시도해주세요.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         }
       } catch (e) {
         if (mounted) {

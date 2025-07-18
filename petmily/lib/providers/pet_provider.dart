@@ -100,38 +100,17 @@ class PetProvider with ChangeNotifier {
     clearError();
     
     try {
-      _pets = await _storageService.loadPets();
-      
-      // If no pets exist, add sample data
-      if (_pets.isEmpty) {
-        _pets = [
-          Pet(
-            id: DateTime.now().millisecondsSinceEpoch.toString(),
-            name: '멍멍이',
-            species: 'dog',
-            breed: '골든 리트리버',
-            birthDate: DateTime.now().subtract(const Duration(days: 365 * 2)),
-            weight: 25.5,
-            gender: 'male',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          ),
-          Pet(
-            id: (DateTime.now().millisecondsSinceEpoch + 1).toString(),
-            name: '냥냥이',
-            species: 'cat',
-            breed: '페르시안',
-            birthDate: DateTime.now().subtract(const Duration(days: 365 * 1)),
-            weight: 4.2,
-            gender: 'female',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          ),
-        ];
-        
-        // Save sample data
-        await _storageService.savePets(_pets);
+      // Firebase에서 데이터 로드 시도
+      try {
+        _pets = await FirebaseService.loadPets();
+        print('Firebase에서 ${_pets.length}마리의 Petmily를 불러왔습니다.');
+      } catch (e) {
+        print('Firebase 로드 실패, 로컬 저장소 사용: $e');
+        _pets = await _storageService.loadPets();
       }
+      
+      // 더미 데이터 제거 - 실제 사용자 데이터만 표시
+      print('총 ${_pets.length}마리의 Petmily가 있습니다.');
     } catch (e) {
       setError('Petmily 정보를 불러오는데 실패했습니다.');
     } finally {

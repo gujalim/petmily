@@ -13,8 +13,12 @@ class AuthProvider with ChangeNotifier {
   bool get isAuthenticated => _user != null;
 
   AuthProvider() {
+    // 초기 사용자 상태 설정
+    _user = AuthService.currentUser;
+    
     // 인증 상태 변경 리스너
     AuthService.authStateChanges.listen((User? user) {
+      print('Auth state changed: ${user?.email}');
       _user = user;
       notifyListeners();
     });

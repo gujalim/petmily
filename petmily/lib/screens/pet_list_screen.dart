@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/pet_provider.dart';
+import '../providers/auth_provider.dart';
 import '../widgets/pet_card.dart';
 import '../widgets/ad_banner.dart';
 
@@ -24,8 +25,17 @@ class PetListScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Consumer<PetProvider>(
-        builder: (context, petProvider, child) {
+      body: Consumer2<PetProvider, AuthProvider>(
+        builder: (context, petProvider, authProvider, child) {
+          // 인증되지 않은 사용자는 로그인 화면으로 리다이렉트
+          if (!authProvider.isAuthenticated) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              context.go('/auth');
+            });
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
           if (petProvider.isLoading) {
             return const Center(
               child: CircularProgressIndicator(),
