@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/pet_provider.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/banner_ad_widget.dart';
+import '../models/pet.dart';
 
 class NewHomeScreen extends StatefulWidget {
   const NewHomeScreen({super.key});
@@ -199,9 +200,20 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                                       title: '건강 체크',
                                       icon: '🏥',
                                       onTap: () {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('건강 체크 기능은 곧 추가될 예정입니다!')),
-                                        );
+                                        if (petProvider.pets.isEmpty) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content: Text('먼저 Petmily를 등록해주세요!'),
+                                              backgroundColor: Colors.orange,
+                                            ),
+                                          );
+                                        } else if (petProvider.pets.length == 1) {
+                                          // 반려동물이 1마리면 바로 건강 체크 화면으로 이동
+                                          context.go('/health-check/${petProvider.pets.first.id}');
+                                        } else {
+                                          // 반려동물이 여러 마리면 선택 화면으로 이동
+                                          _showPetSelectionDialog(context, petProvider.pets);
+                                        }
                                       },
                                     ),
                                   ),
@@ -328,6 +340,51 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showPetSelectionDialog(BuildContext context, List<Pet> pets) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('건강 체크할 Petmily 선택'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: pets.length,
+              itemBuilder: (context, index) {
+                final pet = pets[index];
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: const Color(0xFFF48FB1),
+                    child: Text(
+                      pet.name[0],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  title: Text(pet.name),
+                  subtitle: Text('${pet.species} • ${pet.breed}'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.go('/health-check/${pet.id}');
+                  },
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('취소'),
+            ),
+          ],
+        );
+      },
     );
   }
 } 
