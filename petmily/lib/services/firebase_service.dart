@@ -10,148 +10,120 @@ class FirebaseService {
   static final FirebaseStorage _storage = FirebaseStorage.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // 사용자 ID 가져오기
-  static String? get currentUserId => _auth.currentUser?.uid;
-
-  // Pet 데이터를 Firestore에 저장
+  // 반려동물 저장
   static Future<void> savePet(Pet pet) async {
     try {
-      final userId = currentUserId;
-      if (userId == null) {
-        print('사용자가 로그인되지 않음 - 로컬 저장소만 사용');
-        return;
-      }
-
-      await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('pets')
-          .doc(pet.id)
-          .set(pet.toJson());
+      await _firestore.collection('pets').add({
+        'name': pet.name,
+        'species': pet.species,
+        'breed': pet.breed,
+        'birthDate': pet.birthDate != null ? Timestamp.fromDate(pet.birthDate!) : null,
+        'weight': pet.weight,
+        'imageUrl': pet.imageUrl,
+        'userId': _auth.currentUser?.uid,
+        'createdAt': Timestamp.now(),
+        'updatedAt': Timestamp.now(),
+      });
+      print('반려동물 저장 성공');
     } catch (e) {
-      print('Firebase Pet 저장 중 오류 (로컬 저장소 사용): $e');
-      // Firebase 오류 시 예외를 던지지 않고 로컬 저장소만 사용
+      print('반려동물 저장 실패: $e');
+      rethrow;
     }
   }
 
-  // Pet 데이터를 Firestore에서 불러오기
+  // 반려동물 업데이트
+  static Future<void> updatePet(Pet pet) async {
+    try {
+      await _firestore.collection('pets').doc(pet.id).update({
+        'name': pet.name,
+        'species': pet.species,
+        'breed': pet.breed,
+        'birthDate': pet.birthDate != null ? Timestamp.fromDate(pet.birthDate!) : null,
+        'weight': pet.weight,
+        'imageUrl': pet.imageUrl,
+        'updatedAt': Timestamp.now(),
+      });
+      print('반려동물 업데이트 성공');
+    } catch (e) {
+      print('반려동물 업데이트 실패: $e');
+      rethrow;
+    }
+  }
+
+  // 반려동물 삭제
+  static Future<void> deletePet(String petId) async {
+    try {
+      await _firestore.collection('pets').doc(petId).delete();
+      print('반려동물 삭제 성공');
+    } catch (e) {
+      print('반려동물 삭제 실패: $e');
+      rethrow;
+    }
+  }
+
+  // 반려동물 목록 로드
   static Future<List<Pet>> loadPets() async {
     try {
-      final userId = currentUserId;
+      String? userId = _auth.currentUser?.uid;
       if (userId == null) {
-        print('사용자가 로그인되지 않음 - 빈 리스트 반환');
+        print('사용자 인증 정보가 없습니다.');
         return [];
       }
 
-      final snapshot = await _firestore
-          .collection('users')
-          .doc(userId)
+      QuerySnapshot snapshot = await _firestore
           .collection('pets')
+          .where('userId', isEqualTo: userId)
           .get();
 
-      return snapshot.docs
-          .map((doc) => Pet.fromJson(doc.data()))
-          .toList();
+      List<Pet> pets = snapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        return Pet(
+          id: doc.id,
+          name: data['name'] ?? '',
+          species: data['species'] ?? '',
+          breed: data['breed'] ?? '',
+          birthDate: data['birthDate'] != null ? (data['birthDate'] as Timestamp).toDate() : DateTime.now(),
+          weight: data['weight']?.toDouble() ?? 0.0,
+          gender: data['gender'] ?? 'unknown',
+          imageUrl: data['imageUrl'],
+          createdAt: data['createdAt'] != null ? (data['createdAt'] as Timestamp).toDate() : DateTime.now(),
+          updatedAt: data['updatedAt'] != null ? (data['updatedAt'] as Timestamp).toDate() : DateTime.now(),
+        );
+      }).toList();
+      
+      // 클라이언트에서 정렬
+      pets.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return pets;
     } catch (e) {
-      print('Firebase Pet 불러오기 중 오류 (빈 리스트 반환): $e');
+      print('반려동물 목록 로드 실패: $e');
       return [];
     }
   }
 
-  // Pet 데이터 업데이트
-  static Future<void> updatePet(Pet pet) async {
+  // 이미지 업로드
+  static Future<String> uploadImage(Uint8List imageBytes, String fileName) async {
     try {
-      final userId = currentUserId;
-      if (userId == null) {
-        print('사용자가 로그인되지 않음 - 로컬 저장소만 사용');
-        return;
-      }
-
-      await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('pets')
-          .doc(pet.id)
-          .update(pet.toJson());
-    } catch (e) {
-      print('Firebase Pet 업데이트 중 오류 (로컬 저장소 사용): $e');
-      // Firebase 오류 시 예외를 던지지 않고 로컬 저장소만 사용
-    }
-  }
-
-  // Pet 데이터 삭제
-  static Future<void> deletePet(String petId) async {
-    try {
-      final userId = currentUserId;
-      if (userId == null) {
-        print('사용자가 로그인되지 않음 - 로컬 저장소만 사용');
-        return;
-      }
-
-      await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('pets')
-          .doc(petId)
-          .delete();
-    } catch (e) {
-      print('Firebase Pet 삭제 중 오류 (로컬 저장소 사용): $e');
-      // Firebase 오류 시 예외를 던지지 않고 로컬 저장소만 사용
-    }
-  }
-
-  // 이미지를 Firebase Storage에 업로드
-  static Future<String> uploadImage(File imageFile, String petId) async {
-    try {
-      final userId = currentUserId;
-      if (userId == null) throw Exception('사용자가 로그인되지 않았습니다.');
-
-      final ref = _storage
-          .ref()
-          .child('users/$userId/pets/$petId/${DateTime.now().millisecondsSinceEpoch}.jpg');
-
-      final uploadTask = ref.putFile(imageFile);
-      final snapshot = await uploadTask;
-      final downloadUrl = await snapshot.ref.getDownloadURL();
-
+      Reference ref = _storage.ref().child('pet_images/$fileName');
+      UploadTask uploadTask = ref.putData(imageBytes);
+      TaskSnapshot snapshot = await uploadTask;
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+      print('이미지 업로드 성공: $downloadUrl');
       return downloadUrl;
     } catch (e) {
-      print('이미지 업로드 중 오류: $e');
+      print('이미지 업로드 실패: $e');
       rethrow;
     }
   }
 
-  // 이미지를 Firebase Storage에서 삭제
+  // 이미지 삭제
   static Future<void> deleteImage(String imageUrl) async {
     try {
-      final ref = _storage.refFromURL(imageUrl);
+      Reference ref = _storage.refFromURL(imageUrl);
       await ref.delete();
+      print('이미지 삭제 성공');
     } catch (e) {
-      print('이미지 삭제 중 오류: $e');
+      print('이미지 삭제 실패: $e');
       rethrow;
-    }
-  }
-
-  // 실시간 업데이트 리스너
-  static Stream<List<Pet>> petsStream() {
-    try {
-      final userId = currentUserId;
-      if (userId == null) {
-        print('사용자가 로그인되지 않음 - 빈 스트림 반환');
-        return Stream.value([]);
-      }
-
-      return _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('pets')
-          .snapshots()
-          .map((snapshot) => snapshot.docs
-              .map((doc) => Pet.fromJson(doc.data()))
-              .toList());
-    } catch (e) {
-      print('Firebase 실시간 업데이트 리스너 오류 (빈 스트림 반환): $e');
-      return Stream.value([]);
     }
   }
 } 

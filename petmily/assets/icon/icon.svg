@@ -1,1 +1,22 @@
- 
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 -->
+  <rect width="1024" height="1024" fill="#F48FB1" rx="200"/>
+  
+  <!-- 중앙 원형 배경 -->
+  <circle cx="512" cy="512" r="250" fill="white" opacity="0.95"/>
+  
+  <!-- 하트 모양 -->
+  <path d="M512 300 C512 300 400 200 300 300 C300 400 512 500 512 500 C512 500 724 400 724 300 C724 200 512 300 512 300 Z" 
+        fill="#F48FB1" stroke="#F48FB1" stroke-width="4"/>
+  
+  <!-- "P" 텍스트 -->
+  <text x="512" y="580" font-family="Arial, sans-serif" font-size="200" font-weight="bold" 
+        text-anchor="middle" fill="#F48FB1">P</text>
+  
+  <!-- 작은 장식 요소들 -->
+  <circle cx="200" cy="200" r="20" fill="white" opacity="0.3"/>
+  <circle cx="824" cy="200" r="15" fill="white" opacity="0.3"/>
+  <circle cx="200" cy="824" r="18" fill="white" opacity="0.3"/>
+  <circle cx="824" cy="824" r="12" fill="white" opacity="0.3"/>
+</svg> 

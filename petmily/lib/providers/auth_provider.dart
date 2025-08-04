@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 
-class AuthProvider with ChangeNotifier {
+class AuthProvider extends ChangeNotifier {
   User? _user;
   bool _isLoading = false;
   String? _error;
@@ -13,115 +13,96 @@ class AuthProvider with ChangeNotifier {
   bool get isAuthenticated => _user != null;
 
   AuthProvider() {
-    // 초기 사용자 상태 설정
-    _user = AuthService.currentUser;
-    
-    // 인증 상태 변경 리스너
+    _initAuth();
+  }
+
+  void _initAuth() {
     AuthService.authStateChanges.listen((User? user) {
-      print('Auth state changed: ${user?.email}');
       _user = user;
       notifyListeners();
     });
   }
 
-  // 로그인
-  Future<void> signIn({required String email, required String password}) async {
-    setLoading(true);
-    clearError();
-
-    try {
-      await AuthService.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-    } on FirebaseAuthException catch (e) {
-      setError(AuthService.getErrorMessage(e.code));
-    } catch (e) {
-      setError('로그인 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  // 회원가입
-  Future<void> signUp({required String email, required String password}) async {
-    setLoading(true);
-    clearError();
+  Future<bool> signUp({
+    required String email,
+    required String password,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
 
     try {
       await AuthService.signUpWithEmailAndPassword(
         email: email,
         password: password,
       );
+      _isLoading = false;
+      notifyListeners();
+      return true;
     } on FirebaseAuthException catch (e) {
-      setError(AuthService.getErrorMessage(e.code));
+      _error = AuthService.getErrorMessage(e.code);
+      _isLoading = false;
+      notifyListeners();
+      return false;
     } catch (e) {
-      setError('회원가입 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
+      _error = '알 수 없는 오류가 발생했습니다.';
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 
-  // 로그아웃
-  Future<void> signOut() async {
-    setLoading(true);
-    clearError();
+  Future<bool> signIn({
+    required String email,
+    required String password,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await AuthService.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on FirebaseAuthException catch (e) {
+      _error = AuthService.getErrorMessage(e.code);
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _error = '알 수 없는 오류가 발생했습니다.';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> signOut() async {
+    _isLoading = true;
+    notifyListeners();
 
     try {
       await AuthService.signOut();
-    } catch (e) {
-      setError('로그아웃 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  // 비밀번호 재설정
-  Future<void> resetPassword(String email) async {
-    setLoading(true);
-    clearError();
-
-    try {
-      await AuthService.resetPassword(email);
+      _isLoading = false;
+      notifyListeners();
+      return true;
     } on FirebaseAuthException catch (e) {
-      setError(AuthService.getErrorMessage(e.code));
+      _error = AuthService.getErrorMessage(e.code);
+      _isLoading = false;
+      notifyListeners();
+      return false;
     } catch (e) {
-      setError('비밀번호 재설정 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
+      _error = '알 수 없는 오류가 발생했습니다.';
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 
-  // 프로필 업데이트
-  Future<void> updateProfile({String? displayName, String? photoURL}) async {
-    setLoading(true);
-    clearError();
-
-    try {
-      await AuthService.updateProfile(
-        displayName: displayName,
-        photoURL: photoURL,
-      );
-    } catch (e) {
-      setError('프로필 업데이트 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  // 로딩 상태 설정
-  void setLoading(bool loading) {
-    _isLoading = loading;
-    notifyListeners();
-  }
-
-  // 에러 설정
-  void setError(String? error) {
-    _error = error;
-    notifyListeners();
-  }
-
-  // 에러 초기화
   void clearError() {
     _error = null;
     notifyListeners();

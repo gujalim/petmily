@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 class AuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // 현재 사용자
+  // 현재 사용자 가져오기
   static User? get currentUser => _auth.currentUser;
 
-  // 로그인 상태 스트림
+  // 인증 상태 변경 스트림
   static Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   // 이메일/비밀번호로 회원가입
@@ -21,11 +21,7 @@ class AuthService {
         password: password,
       );
     } catch (e) {
-      print('회원가입 중 오류: $e');
-      // Firebase가 초기화되지 않은 경우 시뮬레이션
-      if (e.toString().contains('No Firebase App')) {
-        throw Exception('Firebase가 설정되지 않았습니다. 로컬 모드로 실행됩니다.');
-      }
+      print('회원가입 오류: $e');
       rethrow;
     }
   }
@@ -41,11 +37,7 @@ class AuthService {
         password: password,
       );
     } catch (e) {
-      print('로그인 중 오류: $e');
-      // Firebase가 초기화되지 않은 경우 시뮬레이션
-      if (e.toString().contains('No Firebase App')) {
-        throw Exception('Firebase가 설정되지 않았습니다. 로컬 모드로 실행됩니다.');
-      }
+      print('로그인 오류: $e');
       rethrow;
     }
   }
@@ -55,28 +47,17 @@ class AuthService {
     try {
       await _auth.signOut();
     } catch (e) {
-      print('로그아웃 중 오류: $e');
+      print('로그아웃 오류: $e');
       rethrow;
     }
   }
 
   // 비밀번호 재설정
-  static Future<void> resetPassword(String email) async {
+  static Future<void> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } catch (e) {
-      print('비밀번호 재설정 중 오류: $e');
-      rethrow;
-    }
-  }
-
-  // 사용자 정보 업데이트
-  static Future<void> updateProfile({String? displayName, String? photoURL}) async {
-    try {
-      await _auth.currentUser?.updateDisplayName(displayName);
-      await _auth.currentUser?.updatePhotoURL(photoURL);
-    } catch (e) {
-      print('프로필 업데이트 중 오류: $e');
+      print('비밀번호 재설정 오류: $e');
       rethrow;
     }
   }

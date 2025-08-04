@@ -52,7 +52,7 @@ class _HealthCheckScreenState extends State<HealthCheckScreen> {
       print('반려동물 ID: ${widget.pet.id}');
       print('선택된 날짜: $_selectedDate');
       
-      HealthRecord record = await _healthService.getOrCreateTodayRecord(widget.pet.id, _selectedDate);
+      HealthRecord record = await HealthService.getOrCreateTodayRecord(widget.pet.id, _selectedDate);
       
       print('로드된 기록: ${record.toFirestore()}');
       print('기록 ID: ${record.id}');
@@ -188,11 +188,11 @@ class _HealthCheckScreenState extends State<HealthCheckScreen> {
         activityMinutes: activityMinutes,
         activityType: _selectedActivityType,
         notes: _notesController.text.isNotEmpty ? _notesController.text : null,
-        updatedAt: DateTime.now(),
+
       );
 
       print('업데이트할 기록: ${updatedRecord.toFirestore()}');
-      await _healthService.updateHealthRecord(updatedRecord);
+      await HealthService.updateHealthRecord(updatedRecord);
       
       print('저장 완료, 현재 상태 업데이트');
       setState(() {
@@ -560,7 +560,7 @@ class _HealthCheckScreenState extends State<HealthCheckScreen> {
                   
                   // 통계 정보
                   KeyedSubtree(
-                    key: ValueKey('stats_${_selectedDateRecord?.id}_${_selectedDateRecord?.updatedAt}'),
+                    key: ValueKey('stats_${_selectedDateRecord?.id}_${_selectedDateRecord?.date}'),
                     child: _buildStatsCard(),
                   ),
                 ],

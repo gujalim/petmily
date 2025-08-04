@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "184434000180",
+    "project_id": "petmily-app",
+    "storage_bucket": "petmily-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:184434000180:android:2c4b96f8d6505fdceee561",
+        "android_client_info": {
+          "package_name": "com.example.petmily"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "184434000180-pjcb0rh5c2lcuqso8m3r0uunc1j3uldk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBISmtP-P0yiWT1ez6PWu5O2yvYhhaKYms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "184434000180-pjcb0rh5c2lcuqso8m3r0uunc1j3uldk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

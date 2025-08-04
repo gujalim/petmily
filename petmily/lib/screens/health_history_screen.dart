@@ -37,8 +37,8 @@ class _HealthHistoryScreenState extends State<HealthHistoryScreen> {
       print('건강 기록 화면 - 데이터 로드 시작');
       print('반려동물 ID: ${widget.pet.id}');
       
-      final records = await _healthService.getHealthRecords(widget.pet.id);
-      final stats = await _healthService.getActivityStats(widget.pet.id);
+      final records = await HealthService.getHealthRecords(widget.pet.id);
+      final stats = await HealthService.getActivityStats(widget.pet.id);
       
       print('건강 기록 화면 - 로드된 기록 수: ${records.length}');
       print('건강 기록 화면 - 통계 데이터: $stats');
@@ -534,7 +534,7 @@ class _HealthHistoryScreenState extends State<HealthHistoryScreen> {
                 ),
               ),
               Text(
-                _formatTime(record.updatedAt),
+                _formatTime(record.date),
                 style: TextStyle(
                   color: Colors.grey[600],
                   fontSize: 12,
